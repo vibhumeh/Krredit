@@ -6,8 +6,8 @@ pragma solidity >=0.5.0;
  * @dev Interface of the ERC20 standard as defined in the EIP.
  */
 interface BMIERC20 {
-    //time weighted avg=sum/time 
-    function sum(address account) external returns(uint256);
+    //time weighted avg=sum/time
+    function GetSum(address account) external returns(uint256);
     //burns tokens
      function burnfrom(address from, uint256 amount) external;
      //mints tokens

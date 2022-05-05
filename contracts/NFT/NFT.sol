@@ -37,7 +37,7 @@ contract Credit is ERC721, ERC721Burnable, Ownable, data{
 
 
 function setPrimary(uint tokenId) public returns(bool){
-require(_isApprovedOrOwner(_msgSender(),tokenId),"caller is not owner nor approved");
+require(_isApprovedOrOwner(_msgSender(),tokenId),"setPrimary: caller is not owner nor approved");
 Primary[msg.sender]=tokenId;
 return true;
 }

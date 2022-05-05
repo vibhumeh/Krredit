@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./vouching.sol";
 import "./Array/Arrayfuncs.sol";
 import "./ds-math/math.sol";
-import "../credit.sol";
+import "../NFT/NFT.sol";
 
 contract Loaning is vouching(address(this)),data,Arrayfuncs,DSMath {
 using SafeMath for uint256;
