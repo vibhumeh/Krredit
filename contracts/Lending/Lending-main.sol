@@ -23,11 +23,11 @@ IERC20 token;
 BMIERC20 _token;
 IArrayfuncs calc;
 uint lim;
-constructor(uint _lim,address _treasury){
+uint cooldown;
+constructor(address _treasury){
 calc=IArrayfuncs(address(this));
 token=IERC20(address(this));
 _token=BMIERC20(address(this));
-lim=_lim; //upper limit of tiers
 _owner=msg.sender;
 treasury=_treasury;
 
@@ -43,19 +43,19 @@ function set(address tk)public{
 
 //function to take loan
 function takeloan (uint tier) public payable{
-require(sub(block.timestamp,timer[msg.sender])>=cooldown[msg.sender],"you are still under cooldown"); //so no loan spams
-require(creditsc_c[msg.sender]>=tier,"you do not have a high enough credit score");
+require(sub(block.timestamp,timer[msg.sender])>=cooldown,"you are still under cooldown"); //so no loan spams
+require(creditsc_c[msg.sender]>=tier**18,"you do not have a high enough credit score");
 require(tier>0);
 require(pending[msg.sender]==false);
 uint interest;
-uint adfee;
-amount[msg.sender]=mul(10**tier,adj);
-_token.mint(msg.sender,amount[msg.sender]);
-interest=wmul(amount[msg.sender],20*adj.div(100));//20%,interest+1% admin fee
-//mul(Rrate[msg.sender],medianL[msg.sender])
-//mul(defexpo[msg.sender],Drate[msg.sender])
+cred[primary[msg.sender]].amount=100 * wpow((adj+adj/10),tier); //amount calc
+_token.mint(msg.sender,cred[primary[msg.sender]].amount[msg.sender]);
+interest=wmul(cred[primary[msg.sender]].amount[msg.sender],20*adj.div(100));//20%,interest+1% admin fee
+uint x=wmul(Rrate[msg.sender],medianL[msg.sender]);
+uint y=wmul(defexpo[msg.sender],Drate[msg.sender]);
 //
-P2[msg.sender]=mul(sub(mul(Rrate[msg.sender],medianL[msg.sender]),mul(defexpo[msg.sender],Drate[msg.sender])),(principal[msg.sender]));
+I2[msg.sender]=wmul(sub(x,y),(interest));
+principal[msg.sender]=cred[primary[msg.sender]].amount + I2;
 pending[msg.sender]=true;
 time[msg.sender]=block.timestamp;
 if(tier==creditsc_c[msg.sender])
@@ -70,7 +70,7 @@ function returnloan() public returns(bool){
  if(block.timestamp.sub(time[msg.sender])>420000){
      creditsc_uc[msg.sender]=0;
      creditsc_c[msg.sender]=0;
-     defults[msg.sender]+=1;
+     defults[msg.sender]+=adj;
      Dtotal[msg.sender]+=P2[msg.sender];
      if(friend[msg.sender]!=address(0)){
          creditsc_c[friend[msg.sender]]=0;
@@ -86,13 +86,13 @@ defexpo[msg.sender]=Ltotal[msg.sender]-Dtotal[msg.sender]; //D
  }
  else{
 require(token.allowance(msg.sender,address(this))==P2[msg.sender],"please approve required amount");
-uint interest=P2[msg.sender].sub(amount[msg.sender]);
+uint interest=P2[msg.sender].sub(cred[primary[msg.sender]].amount[msg.sender]);
 //uint burning=80;
 //uint treasurym=15;
 //uint ownerm=5;
 
 //ducjdnc
-require(interest+amount[msg.sender]==P2[msg.sender],"math error");
+require(interest+cred[primary[msg.sender]].amount[msg.sender]==P2[msg.sender],"math error");
 
 //token.transferFrom(msg.sender,_owner,interest.mul(ownerm.div(100)));
 token.transferFrom(msg.sender,treasury,interest.div(2));//mul(treasurym.div(100)));
@@ -100,17 +100,16 @@ _token.burnfrom(msg.sender,interest.div(2));//mul(burning.div(100)));
 _token.burnfrom(msg.sender,amount[msg.sender]);
  //replace with burn //math to calc P2 needs to be checked
  pending[msg.sender]=false;
- creditsc_uc[msg.sender]+=1;
+ creditsc_uc[msg.sender]+=adj;
 
  //decide if to increase credit score, (checks if under limit)
  if(creditsc_c[msg.sender]<lim && _match[msg.sender]==true){
  rounds[msg.sender]=rounds[msg.sender].add(1);
  _match[msg.sender]=false;
  //sets cooldown before next loan.
-  cooldown[msg.sender]=10**creditsc_c[msg.sender];
  timer[msg.sender]=block.timestamp;  //marks time when last loan was returned
  if (rounds[msg.sender]>=roundsreq[msg.sender]){
-     creditsc_c[msg.sender]=creditsc_c[msg.sender].add(1);
+     creditsc_c[msg.sender]=creditsc_c[msg.sender].add(adj);
      if(creditsc_c[msg.sender]>10){
      friend[msg.sender]=address(0);//no link after person reaches level 10.
      }
@@ -120,7 +119,7 @@ _token.burnfrom(msg.sender,amount[msg.sender]);
  }//second if
 
  }//first if
- repayed[msg.sender]+=1;
+ repayed[msg.sender]+=adj;
  Dtotal[msg.sender]+=P2[msg.sender];
  princeL[msg.sender].push(P2[msg.sender]);
  calc.sortA(princeL[msg.sender]);

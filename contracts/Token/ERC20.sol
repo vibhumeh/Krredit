@@ -19,8 +19,19 @@ function sqrt(uint x) public returns (uint y) {
         z = (x / z + z) / 2;
     }
 }
-
-
+//
+function wsqrt(uint x) public returns (uint y) {
+    uint y;
+    uint k=x;
+    x*=WAD;
+    uint z = (x + 1)/2;
+    y = x;
+    while (z < y) {
+        y = z;
+        z = (wdiv(x,z) + z) / 2;
+    }
+}
+//
   //
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
@@ -29,15 +40,15 @@ function sqrt(uint x) public returns (uint y) {
         _grantRole(MINTER_ROLE, loaner);
     }
 
-     mapping(address => uint) sum;
-     mapping(address => uint) timestamp;
+     mapping(address => uint) c_sum;
+     uint236 k=30;
      function GetSum(address account) public returns(uint256)
      {
        return sum[address];
      }
     function mint(address to, uint256 amount) public onlyRole(MINTER_ROLE) {
       UpdateAR(to);
-       sum[to]+=AccRate.credearning[msg.sender]*sqrt(balanceOf[to]);
+       c_sum[to]+=div(wsqrt(mul(AccRate.credearning[msg.sender],wsqrt(balanceOf[to]))),k);
 
         _mint(to, amount);
 
@@ -45,14 +56,14 @@ function sqrt(uint x) public returns (uint y) {
 
     function burn(uint amount) public override {
   UpdateAR(msg.sender);
-    sum[msg.sender]=balanceOf(msg.sender)*(block.timestamp-time[msg.sender]);
+    c_sum[msg.sender]+=div(wsqrt(mul(AccRate.credearning[msg.sender],wsqrt(balanceOf[to]))),k);
 
     _burn(msg.sender,amount);
 
     }
     function burnFrom(address account, uint256 amount) override public virtual {
       UpdateAR(account);
-       sum[account]=balanceOf(account)*(block.timestamp-time[account]);
+       c_sum[to]+=div(wsqrt(mul(AccRate.credearning[account],wsqrt(balanceOf[to]))),k);
 
         _spendAllowance(account, _msgSender(), amount);
         _burn(account, amount);
@@ -60,8 +71,8 @@ function sqrt(uint x) public returns (uint y) {
     }
     function transfer(address to, uint256 amount) public virtual override returns (bool) {
     UpdateAR(msg.sender,to);
-        sum[to]=balanceOf(to)*(block.timestamp-time[to]);
-        sum[msg.sender]=balanceOf(msg.sender)*(block.timestamp-time[msg.sender]);
+        c_sum[to]+=div(wsqrt(mul(AccRate.credearning[to],sqrt(balanceOf[to]))),k);
+        c_sum[msg.sender]+=div(wsqrt(mul(AccRate.credearning[msg.sender],wsqrt(balanceOf[to]))),k);
         address owner = _msgSender();
         _transfer(owner, to, amount);
         return true;
@@ -72,8 +83,8 @@ function sqrt(uint x) public returns (uint y) {
         uint256 amount
     ) public override returns (bool) {
       UpdateAR(from,to);
-        sum[to]=balanceOf(to)*(block.timestamp-time[to]);
-        sum[from]=balanceOf(from)*(block.timestamp-time[from]);
+        c_sum[to]+=div(wsqrt(mul(AccRate.credearning[to],wsqrt(balanceOf[to]))),k);
+        c_sum[from]+=div(wsqrt(mul(AccRate.credearning[from],wsqrt(balanceOf[to]))),k);
 
             address spender = _msgSender();
             _spendAllowance(from, spender, amount);
@@ -84,7 +95,7 @@ function sqrt(uint x) public returns (uint y) {
     function redeem() public returns(bool){
       require(Primary[msg.sender]!=0);
       require(block.timestamp-timstamp[msg.sender]>1260);
-      cred[Primary[msg.sender]].creditsc_c+=sum;
+      cred[Primary[msg.sender]].creditsc_c+=c_sum;
       sum=0;
       timstamp[msg.sender]=block.timstamp;
     }
