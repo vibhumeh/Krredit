@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity >=0.5.0;
-
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 /**
  * @dev Interface of the ERC20 standard as defined in the EIP.
  */
-interface BMIERC20 {
+interface _IERC20 is IERC20{
     //time weighted avg=sum/time
     function GetSum(address account) external returns(uint256);
     //burns tokens

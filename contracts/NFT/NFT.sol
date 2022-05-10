@@ -38,6 +38,8 @@ contract Credit is ERC721, ERC721Burnable, Ownable, data{
 
 function setPrimary(uint tokenId) public returns(bool){
 require(_isApprovedOrOwner(_msgSender(),tokenId),"setPrimary: caller is not owner nor approved");
+
+require(!cred[Primary[msg.sender]].pending,"you cannot change your primary when you are in debt");
 Primary[msg.sender]=tokenId;
 return true;
 }
