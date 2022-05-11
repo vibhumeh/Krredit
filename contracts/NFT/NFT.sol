@@ -10,14 +10,22 @@ contract data{
 //taking loan
 uint creditsc_c;
 uint creditsc_uc; //
-uint _match;
-
+bool _match;
+uint principal;
 uint amount;
 //paying loan
-uint pending;
+bool pending;
 uint Ldate;
 uint time;
+uint timer;
 //DEBT CALC
+uint defults;
+uint repayed;
+uint Ltotal;
+uint Dtotal;
+uint defexpo;
+uint Drate;
+uint Rrate;
 uint[] princeD;
 uint[] princeL;
 uint medianL;

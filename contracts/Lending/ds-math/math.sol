@@ -85,4 +85,24 @@ contract DSMath {
             }
         }
     }
+
+    function wsqrt(uint x) public returns (uint y) {
+        uint z = (x + 1)/2;
+        y = x;
+        while (z < y) {
+            y = z;
+            z = (wdiv(x,z) + z) / 2;
+        }
+    }
+    function wpow(uint x, uint n) public returns (uint z) {
+       z = n % 2 != 0 ? x : WAD;
+
+       for (n /= 2; n != 0; n /= 2) {
+           x = wmul(x, x);
+
+           if (n % 2 != 0) {
+               z = wmul(z, x);
+           }
+       }
+    }
 }

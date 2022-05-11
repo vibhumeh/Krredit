@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.7;
-
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
@@ -8,6 +8,7 @@ import "../Credit/Token_shots.sol";
 
 
 contract Zeno is ERC20, ERC20Burnable, AccessControl,TaxCollector{
+using SafeMath for uint256;
 //
 
 
@@ -20,17 +21,7 @@ function sqrt(uint x) public returns (uint y) {
     }
 }
 //
-function wsqrt(uint x) public returns (uint y) {
-    uint y;
-    uint k=x;
-    x*=WAD;
-    uint z = (x + 1)/2;
-    y = x;
-    while (z < y) {
-        y = z;
-        z = (wdiv(x,z) + z) / 2;
-    }
-}
+
 //
   //
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
@@ -41,14 +32,15 @@ function wsqrt(uint x) public returns (uint y) {
     }
 
      mapping(address => uint) c_sum;
-     uint236 k=30;
+     mapping(address => uint) timestamp;
+     uint256 k=30;
      function GetSum(address account) public returns(uint256)
      {
-       return sum[address];
+       return c_sum[account];
      }
     function mint(address to, uint256 amount) public onlyRole(MINTER_ROLE) {
       UpdateAR(to);
-       c_sum[to]+=div(wsqrt(mul(AccRate.credearning[msg.sender],wsqrt(balanceOf[to]))),k);
+       c_sum[to]+=wsqrt(mul(AccRate.credearning[to],wsqrt(balanceOf(to)))).div(k);
 
         _mint(to, amount);
 
@@ -56,14 +48,14 @@ function wsqrt(uint x) public returns (uint y) {
 
     function burn(uint amount) public override {
   UpdateAR(msg.sender);
-    c_sum[msg.sender]+=div(wsqrt(mul(AccRate.credearning[msg.sender],wsqrt(balanceOf[to]))),k);
+    c_sum[msg.sender]+=wsqrt(mul(AccRate.credearning[msg.sender],wsqrt(balanceOf(msg.sender)))).div(k);
 
     _burn(msg.sender,amount);
 
     }
     function burnFrom(address account, uint256 amount) override public virtual {
       UpdateAR(account);
-       c_sum[to]+=div(wsqrt(mul(AccRate.credearning[account],wsqrt(balanceOf[to]))),k);
+       c_sum[account]+=wsqrt(mul(AccRate.credearning[account],wsqrt(balanceOf(account)))).div(k);
 
         _spendAllowance(account, _msgSender(), amount);
         _burn(account, amount);
@@ -71,8 +63,8 @@ function wsqrt(uint x) public returns (uint y) {
     }
     function transfer(address to, uint256 amount) public virtual override returns (bool) {
     UpdateAR(msg.sender,to);
-        c_sum[to]+=div(wsqrt(mul(AccRate.credearning[to],sqrt(balanceOf[to]))),k);
-        c_sum[msg.sender]+=div(wsqrt(mul(AccRate.credearning[msg.sender],wsqrt(balanceOf[to]))),k);
+        c_sum[to]+=wsqrt(mul(AccRate.credearning[to],sqrt(balanceOf(to)))).div(k);
+        c_sum[msg.sender]+=wsqrt(mul(AccRate.credearning[msg.sender],wsqrt(balanceOf(to)))).div(k);
         address owner = _msgSender();
         _transfer(owner, to, amount);
         return true;
@@ -83,8 +75,8 @@ function wsqrt(uint x) public returns (uint y) {
         uint256 amount
     ) public override returns (bool) {
       UpdateAR(from,to);
-        c_sum[to]+=div(wsqrt(mul(AccRate.credearning[to],wsqrt(balanceOf[to]))),k);
-        c_sum[from]+=div(wsqrt(mul(AccRate.credearning[from],wsqrt(balanceOf[to]))),k);
+        c_sum[to]+=wsqrt(mul(AccRate.credearning[to],wsqrt(balanceOf(to)))).div(k);
+        c_sum[from]+=wsqrt(mul(AccRate.credearning[from],wsqrt(balanceOf(to)))).div(k);
 
             address spender = _msgSender();
             _spendAllowance(from, spender, amount);
@@ -94,9 +86,9 @@ function wsqrt(uint x) public returns (uint y) {
     //
     function redeem() public returns(bool){
       require(Primary[msg.sender]!=0);
-      require(block.timestamp-timstamp[msg.sender]>1260);
-      cred[Primary[msg.sender]].creditsc_c+=c_sum;
-      sum=0;
-      timstamp[msg.sender]=block.timstamp;
+      require(block.timestamp-timestamp[msg.sender]>1260);
+      cred[Primary[msg.sender]].creditsc_c+=c_sum[msg.sender];
+      c_sum[msg.sender]=0;
+      timestamp[msg.sender]=block.timestamp;
     }
 }

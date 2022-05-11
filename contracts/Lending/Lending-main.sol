@@ -6,9 +6,8 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./vouching.sol";
 import "./Array/Arrayfuncs.sol";
 import "./ds-math/math.sol";
-import "../NFT/NFT.sol";
 
-contract Loaning is vouching(address(this)),data,Arrayfuncs,DSMath {
+contract Loaning is vouching(address(this)),Arrayfuncs,DSMath {
 using SafeMath for uint256;
 uint burner=80*adj;
 uint rate=20;
@@ -41,56 +40,55 @@ function set(address tk)public{
 
 //function to take loan
 function takeloan (uint tier) public payable{
-require(Primary!=0,"please confirm your primary credit card");
+require(Primary[msg.sender]!=0,"please confirm your primary credit card");
 require(sub(block.timestamp,cred[Primary[msg.sender]].timer)>=cooldown,"you are still under cooldown"); //so no loan spams
 require(cred[Primary[msg.sender]].creditsc_c>=tier*adj,"you do not have a high enough credit score");
 require(tier>0);
-require(!pending,"You have already taken a loan, please re-pay to take a new loan");
+require(!cred[Primary[msg.sender]].pending,"You have already taken a loan, please re-pay to take a new loan");
 uint interest;
-cred[Primary[msg.sender]].amount=100 * wpow((adj+adj/10),tier); //amount calc
+cred[Primary[msg.sender]].amount=100*wpow((adj+adj/10),tier); //amount calc
 token.mint(msg.sender,cred[Primary[msg.sender]].amount);
-interest=wmul(cred[Primary[msg.sender]].amount,mul(rate,div(adj,100)));//20%,interest+1% admin fee
-uint x=wmul(Rrate,medianL);
-uint y=wmul(defexpo,Drate);
+interest=wmul(cred[Primary[msg.sender]].amount,(rate.mul(adj.div(100))));//20%,interest+1% admin fee
+uint x=wmul(cred[Primary[msg.sender]].Rrate,cred[Primary[msg.sender]].medianL);
+uint l=wmul(cred[Primary[msg.sender]].defexpo,cred[Primary[msg.sender]].Drate);
 //
-I2=wmul(sub(x,y),(interest));
-principal=cred[Primary[msg.sender]].amount + I2;
-pending=true;
-time=block.timestamp;
-if(tier==creditsc_c)
-_match==true;
+I2[msg.sender]=wmul(x.sub(l),(interest));
+cred[Primary[msg.sender]].principal=add(cred[Primary[msg.sender]].amount,I2[msg.sender]);
+cred[Primary[msg.sender]].pending=true;
+cred[Primary[msg.sender]].time=block.timestamp;
+if(tier==cred[Primary[msg.sender]].creditsc_c)
+cred[Primary[msg.sender]]._match==true;
 }
 //repayment rate calc: rrate=1-Drate; //R
 //defult rate calc: drate=(defults/(repayed+defults));
 function returnloan() public returns(bool){
 //I2 = (R*M2-D*H)*I-Ix
-
- require(pending=true);
- P2=cred[Primary[msg.sender]].amount+I2;
- if(block.timestamp.sub(time)>420000){
+ require(cred[Primary[msg.sender]].pending=true);
+ uint P2=cred[Primary[msg.sender]].principal;
+ if(block.timestamp.sub(cred[Primary[msg.sender]].time)>420000){
      cred[Primary[msg.sender]].creditsc_uc=0;
      cred[Primary[msg.sender]].creditsc_c=0;
      cred[Primary[msg.sender]].defults+=adj;
      cred[Primary[msg.sender]].Dtotal+=P2;
-     if(friend!=address(0)){
-         cred[Primary[friend]].creditsc_c=0;
-         cred[Primary[friend]].creditsc_uc[friend]=0;
-         friend=address(0);
+     if(friend[msg.sender]!=address(0)){
+         cred[Primary[friend[msg.sender]]].creditsc_c=0;
+         cred[Primary[friend[msg.sender]]].creditsc_uc=0;
+         friend[msg.sender]=address(0);
      }
-     creditsc_c[friend]=0;
+     cred[Primary[msg.sender]].creditsc_c=0; //why?
      cred[Primary[msg.sender]].princeD.push(P2);
 sortA(cred[Primary[msg.sender]].princeD);
-cred[Primary[msg.sender]].medianD=getmedian(princeD);//M1
+cred[Primary[msg.sender]].medianD=getmedian(cred[Primary[msg.sender]].princeD);//M1
 cred[Primary[msg.sender]].defexpo=sub(cred[Primary[msg.sender]].Ltotal,cred[Primary[msg.sender]].Dtotal); //D
      return false;
  }
  else{
 require(token.allowance(msg.sender,address(this))==P2,"please approve required amount");
 
-uint interest=I2;
+uint interest=I2[msg.sender];
 uint burning=burner;
 uint treasurym=sub(mul(100,adj),burning);
-//uint ownerm=5;
+uint ownerm=5;
 
 
 require(interest+cred[Primary[msg.sender]].amount==P2,"math error");
@@ -98,19 +96,19 @@ require(interest+cred[Primary[msg.sender]].amount==P2,"math error");
 token.transferFrom(msg.sender,_owner,interest.mul(ownerm.div(100)));
 token.transferFrom(msg.sender,treasury,interest.div(2));//mul(treasurym.div(100)));
 token.burnfrom(msg.sender,interest.div(2));//mul(burning.div(100)));
-token.burnfrom(msg.sender,amount);
+token.burnfrom(msg.sender,cred[Primary[msg.sender]].amount);
 
  //replace with burn //math to calc P2 needs to be checked
  cred[Primary[msg.sender]].pending=false;
  cred[Primary[msg.sender]].creditsc_uc+=adj;
 
  //decide if to increase credit score, (checks if under limit)
- if(creditsc_c<lim && _match==true){
+ if(cred[Primary[msg.sender]].creditsc_c<lim &&cred[Primary[msg.sender]]. _match==true){
  cred[Primary[msg.sender]].creditsc_c=add(cred[Primary[msg.sender]].creditsc_c,adj);
  cred[Primary[msg.sender]]._match=false;
  //sets cooldown before next loan.
 }
- timer=block.timestamp;  //marks time when last loan was returned
+ cred[Primary[msg.sender]].timer=block.timestamp;  //marks time when last loan was returned
 
 
  //second if
@@ -119,13 +117,13 @@ token.burnfrom(msg.sender,amount);
  cred[Primary[msg.sender]].repayed+=adj;
  cred[Primary[msg.sender]].Dtotal+=P2;
  cred[Primary[msg.sender]].princeL.push(P2);
- sortA(princeL);
+ sortA(cred[Primary[msg.sender]].princeL);
  cred[Primary[msg.sender]].medianL=getmedian(cred[Primary[msg.sender]].princeL);//M2
 cred[Primary[msg.sender]].defexpo=sub(cred[Primary[msg.sender]].Ltotal,cred[Primary[msg.sender]].Dtotal); //D
 uint x=add(cred[Primary[msg.sender]].repayed,cred[Primary[msg.sender]].defults);
 cred[Primary[msg.sender]].Drate=wdiv(cred[Primary[msg.sender]].defults,x);//H
 
-cred[Primary[msg.sender]].Rrate=sub(1,Drate]);//R
+cred[Primary[msg.sender]].Rrate=sub(1,cred[Primary[msg.sender]].Drate);//R
  return true;
 
 
@@ -142,8 +140,8 @@ function freemoney() public  payable{
 }// set governor contract*/
 function increment(address pardonee)public{
     //require(msg.sender==allowedcon||msg.sender==allowedcon2,"you do not have permission to do this action.");
-    creditsc_c[pardonee]=1;
-    creditsc_uc[pardonee]=1;
+    cred[Primary[pardonee]].creditsc_c==1;
+    cred[Primary[pardonee]].creditsc_uc==1;
 
 }
 
