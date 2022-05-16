@@ -25,9 +25,9 @@ IArrayfuncs calc;
 uint lim;
 uint cooldown;
 mapping (address=>uint256) I2;
-constructor(address _treasury){
+constructor(){
 _owner=msg.sender;
-treasury=_treasury;
+treasury=_owner;
 
 }
 //cred[Primary[msg.sender]].
