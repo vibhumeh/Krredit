@@ -1,7 +1,6 @@
 pragma solidity ^0.8.7;
 import "../NFT/NFT.sol";
 import "../Lending/ds-math/math.sol";
-
 contract TaxCollector is data,DSMath{
 //
 
@@ -18,6 +17,10 @@ struct _AccRate{
 
 }
 _AccRate AccRate;
+constructor() {
+  AccRate.rate=1;
+  AccRate.lUpdateTime=block.timestamp;
+}
 function UpdateAR(address msg_sender)public {
   AccRate.nAR=add(AccRate.lAR,wpow((adj+AccRate.rate),AccRate.lUpdateTime-block.timestamp));
   AccRate.lUpdateTime=block.timestamp;

@@ -12,35 +12,32 @@ using SafeMath for uint256;
 //
 
 
-function sqrt(uint x) public returns (uint y) {
-    uint z = (x + 1) / 2;
-    y = x;
-    while (z < y) {
-        y = z;
-        z = (x / z + z) / 2;
-    }
-}
+
+
 //
 
 //
   //
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
-    constructor(address loaner) ERC20("Zeno", "Zn") {
+    constructor() ERC20("Zeno", "Zn") {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _grantRole(MINTER_ROLE, loaner);
+
     }
 
      mapping(address => uint) c_sum;
      mapping(address => uint) timestamp;
      uint256 k=30;
-     function GetSum(address account) public returns(uint256)
+     function giveRole(address loaner) public onlyRole(DEFAULT_ADMIN_ROLE) {
+         _grantRole(MINTER_ROLE, loaner);
+     }
+     function GetSum(address account) public view returns(uint256)
      {
        return c_sum[account];
      }
     function mint(address to, uint256 amount) public onlyRole(MINTER_ROLE) {
       UpdateAR(to);
-       c_sum[to]+=wsqrt(mul(AccRate.credearning[to],wsqrt(balanceOf(to)))).div(k);
+       c_sum[to]=sum(c_sum[to],(wsqrt(mul(AccRate.credearning[to],wsqrt(balanceOf(to)))).div(k)));
 
         _mint(to, amount);
 
@@ -63,7 +60,7 @@ function sqrt(uint x) public returns (uint y) {
     }
     function transfer(address to, uint256 amount) public virtual override returns (bool) {
     UpdateAR(msg.sender,to);
-        c_sum[to]+=wsqrt(mul(AccRate.credearning[to],sqrt(balanceOf(to)))).div(k);
+        c_sum[to]+=wsqrt(mul(AccRate.credearning[to],wsqrt(balanceOf(to)))).div(k);
         c_sum[msg.sender]+=wsqrt(mul(AccRate.credearning[msg.sender],wsqrt(balanceOf(to)))).div(k);
         address owner = _msgSender();
         _transfer(owner, to, amount);
@@ -90,5 +87,6 @@ function sqrt(uint x) public returns (uint y) {
       cred[Primary[msg.sender]].creditsc_c+=c_sum[msg.sender];
       c_sum[msg.sender]=0;
       timestamp[msg.sender]=block.timestamp;
+      return true;
     }
 }

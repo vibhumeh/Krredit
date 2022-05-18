@@ -86,7 +86,7 @@ contract DSMath {
         }
     }
 
-    function wsqrt(uint x) public returns (uint y) {
+    function wsqrt(uint x) public pure returns (uint y) {
         uint z = (x + 1)/2;
         y = x;
         while (z < y) {
@@ -94,7 +94,7 @@ contract DSMath {
             z = (wdiv(x,z) + z) / 2;
         }
     }
-    function wpow(uint x, uint n) public returns (uint z) {
+    function wpow(uint x, uint n) public pure returns (uint z) {
        z = n % 2 != 0 ? x : WAD;
 
        for (n /= 2; n != 0; n /= 2) {
