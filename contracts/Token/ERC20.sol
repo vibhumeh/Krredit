@@ -37,7 +37,7 @@ using SafeMath for uint256;
      }
     function mint(address to, uint256 amount) public onlyRole(MINTER_ROLE) {
       UpdateAR(to);
-       c_sum[to]=sum(c_sum[to],(wsqrt(mul(AccRate.credearning[to],wsqrt(balanceOf(to)))).div(k)));
+       c_sum[to]=add(c_sum[to],(wsqrt(mul(AccRate.credearning[to],wsqrt(balanceOf(to)))).div(k)));
 
         _mint(to, amount);
 
@@ -84,7 +84,7 @@ using SafeMath for uint256;
     function redeem() public returns(bool){
       require(Primary[msg.sender]!=0);
       require(block.timestamp-timestamp[msg.sender]>1260);
-      cred[Primary[msg.sender]].creditsc_c+=c_sum[msg.sender];
+      cred[Primary[msg.sender]].creditsc_c=add(cred[Primary[msg.sender]].creditsc_c,c_sum[msg.sender]);
       c_sum[msg.sender]=0;
       timestamp[msg.sender]=block.timestamp;
       return true;

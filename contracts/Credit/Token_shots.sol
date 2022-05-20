@@ -22,7 +22,7 @@ constructor() {
   AccRate.lUpdateTime=block.timestamp;
 }
 function UpdateAR(address msg_sender)public {
-  AccRate.nAR=add(AccRate.lAR,wpow((adj+AccRate.rate),AccRate.lUpdateTime-block.timestamp));
+ AccRate.nAR=add(AccRate.lAR,wpow((adj+AccRate.rate),sub(block.timestamp,AccRate.lUpdateTime)));
   AccRate.lUpdateTime=block.timestamp;
   AccRate.lAR=AccRate.nAR;
   AccRate.credearning[msg_sender]=sub(AccRate.nAR,AccRate.LastAROfClaim[msg_sender]);
@@ -30,7 +30,7 @@ function UpdateAR(address msg_sender)public {
 
 }// needs access specifiers.
 function UpdateAR(address msg_sender,address to) public returns(bool){
-  AccRate.nAR=add(AccRate.lAR,wpow((add(adj,AccRate.rate)),sub(block.timestamp,AccRate.lUpdateTime)));
+ AccRate.nAR=add(AccRate.lAR,wpow((add(adj,AccRate.rate)),sub(block.timestamp,AccRate.lUpdateTime)));
   AccRate.lUpdateTime=block.timestamp;
   AccRate.lAR=AccRate.nAR;
   AccRate.credearning[msg_sender]=sub(AccRate.nAR,AccRate.LastAROfClaim[msg_sender]);

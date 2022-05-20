@@ -39,14 +39,14 @@ function set(address tk)public{
 }
 
 //function to take loan
-function takeloan (uint tier) public payable{
+function takeloan (uint tier) public {
 require(Primary[msg.sender]!=0,"please confirm your primary credit card");
 require(sub(block.timestamp,cred[Primary[msg.sender]].timer)>=cooldown,"you are still under cooldown"); //so no loan spams
 require(cred[Primary[msg.sender]].creditsc_c>=tier*adj,"you do not have a high enough credit score");
 require(tier>0);
 require(!cred[Primary[msg.sender]].pending,"You have already taken a loan, please re-pay to take a new loan");
 uint interest;
-cred[Primary[msg.sender]].amount=100*wpow((adj+adj/10),tier); //amount calc
+cred[Primary[msg.sender]].amount=100*wpow((add(adj,(adj.div(10)))),tier); //amount calc
 token.mint(msg.sender,cred[Primary[msg.sender]].amount);
 interest=wmul(cred[Primary[msg.sender]].amount,(rate.mul(adj.div(100))));//20%,interest+1% admin fee
 uint x=wmul(cred[Primary[msg.sender]].Rrate,cred[Primary[msg.sender]].medianL);
@@ -68,8 +68,8 @@ function returnloan() public returns(bool){
  if(block.timestamp.sub(cred[Primary[msg.sender]].time)>420000){
      cred[Primary[msg.sender]].creditsc_uc=0;
      cred[Primary[msg.sender]].creditsc_c=0;
-     cred[Primary[msg.sender]].defults+=adj;
-     cred[Primary[msg.sender]].Dtotal+=P2;
+     cred[Primary[msg.sender]].defults=add( cred[Primary[msg.sender]].defults,adj);
+     cred[Primary[msg.sender]].Dtotal=add( cred[Primary[msg.sender]].Dtotal,P2);
      if(friend[msg.sender]!=address(0)){
          cred[Primary[friend[msg.sender]]].creditsc_c=0;
          cred[Primary[friend[msg.sender]]].creditsc_uc=0;
@@ -91,7 +91,7 @@ uint treasurym=sub(mul(100,adj),burning);
 uint ownerm=5;
 
 
-require(interest+cred[Primary[msg.sender]].amount==P2,"math error");
+require(add(interest,cred[Primary[msg.sender]].amount)==P2,"math error");
 
 token.transferFrom(msg.sender,_owner,interest.mul(ownerm.div(100)));
 token.transferFrom(msg.sender,treasury,interest.div(2));//mul(treasurym.div(100)));
@@ -100,7 +100,7 @@ token.burnfrom(msg.sender,cred[Primary[msg.sender]].amount);
 
  //replace with burn //math to calc P2 needs to be checked
  cred[Primary[msg.sender]].pending=false;
- cred[Primary[msg.sender]].creditsc_uc+=adj;
+ cred[Primary[msg.sender]].creditsc_uc=add( cred[Primary[msg.sender]].creditsc_uc,adj);
 
  //decide if to increase credit score, (checks if under limit)
  if(cred[Primary[msg.sender]].creditsc_c<lim &&cred[Primary[msg.sender]]. _match==true){
@@ -114,8 +114,8 @@ token.burnfrom(msg.sender,cred[Primary[msg.sender]].amount);
  //second if
 
  //first if
- cred[Primary[msg.sender]].repayed+=adj;
- cred[Primary[msg.sender]].Dtotal+=P2;
+ cred[Primary[msg.sender]].repayed=add( cred[Primary[msg.sender]].repayed,adj);
+ cred[Primary[msg.sender]].Dtotal=add( cred[Primary[msg.sender]].Dtotal,P2);
  cred[Primary[msg.sender]].princeL.push(P2);
  sortA(cred[Primary[msg.sender]].princeL);
  cred[Primary[msg.sender]].medianL=getmedian(cred[Primary[msg.sender]].princeL);//M2
