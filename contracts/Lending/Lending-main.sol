@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./vouching.sol";
 import "./Array/Arrayfuncs.sol";
 import "./ds-math/math.sol";
+import "../NFT/ICredit.sol";
 
 contract Loaning is vouching(address(this)),Arrayfuncs,DSMath {
 using SafeMath for uint256;
@@ -21,6 +22,7 @@ address governor;
 address _owner;
 address treasury;
 _IERC20 token;
+ICredit NFT;
 IArrayfuncs calc;
 uint lim;
 uint cooldown;
@@ -34,8 +36,9 @@ treasury=_owner;
 modifier only_owner(){
     require(msg.sender==_owner);
 _;}
-function set(address tk)public{
+function set(address tk, address _NFT)public{
     token=_IERC20(tk);
+    NFT=ICredit(NFT);
 }
 
 //function to take loan
@@ -138,10 +141,12 @@ function freemoney() public  payable{
     governor=_governor;
     return true;
 }// set governor contract*/
+//for testing PURPOSE:
 function increment(address pardonee)public{
     //require(msg.sender==allowedcon||msg.sender==allowedcon2,"you do not have permission to do this action.");
-    cred[Primary[pardonee]].creditsc_c==1;
-    cred[Primary[pardonee]].creditsc_uc==1;
+    NFT.safeMint(pardonee);
+    cred[Primary[pardonee]].creditsc_c==1*adj;
+    cred[Primary[pardonee]].creditsc_uc==1*adj;
 
 }
 

@@ -22,7 +22,7 @@ using SafeMath for uint256;
 
     constructor() ERC20("Zeno", "Zn") {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
-
+        _grantRole(MINTER_ROLE,msg.sender);
     }
 
      mapping(address => uint) c_sum;

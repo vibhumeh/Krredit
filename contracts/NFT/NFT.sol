@@ -52,7 +52,7 @@ Primary[msg.sender]=tokenId;
 return true;
 }
 
-    function safeMint(address to) public onlyOwner {
+    function safeMint(address to) public{ //onlyOwner {
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);

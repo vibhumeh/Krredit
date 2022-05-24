@@ -1,0 +1,143 @@
+{
+  "contractName": "ICredit",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        }
+      ],
+      "name": "safeMint",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.8.7+commit.e28d00a7\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"}],\"name\":\"safeMint\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/NFT/ICredit.sol\":\"ICredit\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/NFT/ICredit.sol\":{\"keccak256\":\"0x3960f40c23595e80eab39c101eee6c4ce5fd95861e1c8eb528db6d66e46c0263\",\"urls\":[\"bzz-raw://2a7d5c2f22444e828c47949fd67c58c344473e700acc89be60df9c0a7427749f\",\"dweb:/ipfs/QmSpwK6gEEQLGkn4zpMGr8LjepCUez1oNmgEiabTmfJkPR\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "pragma solidity 0.8.7;\n\ninterface ICredit{\nfunction safeMint(address to) external;\n}\n",
+  "sourcePath": "/Users/vibhu/node_manager/node_modules/Solidity/Zeno/contracts/NFT/ICredit.sol",
+  "ast": {
+    "absolutePath": "project:/contracts/NFT/ICredit.sol",
+    "exportedSymbols": {
+      "ICredit": [
+        5173
+      ]
+    },
+    "id": 5174,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 5167,
+        "literals": [
+          "solidity",
+          "0.8",
+          ".7"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:22:26"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 5173,
+        "linearizedBaseContracts": [
+          5173
+        ],
+        "name": "ICredit",
+        "nameLocation": "34:7:26",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "functionSelector": "40d097c3",
+            "id": 5172,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "safeMint",
+            "nameLocation": "52:8:26",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 5170,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 5169,
+                  "mutability": "mutable",
+                  "name": "to",
+                  "nameLocation": "69:2:26",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 5172,
+                  "src": "61:10:26",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 5168,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "61:7:26",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "60:12:26"
+            },
+            "returnParameters": {
+              "id": 5171,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "81:0:26"
+            },
+            "scope": 5173,
+            "src": "43:39:26",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 5174,
+        "src": "24:60:26",
+        "usedErrors": []
+      }
+    ],
+    "src": "0:85:26"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.7+commit.e28d00a7.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.4.7",
+  "updatedAt": "2022-05-21T04:30:58.330Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}
