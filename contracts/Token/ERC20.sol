@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "../Credit/Token_shots.sol";
-
+import "../Lending/ILoaning.sol";
 
 contract Zeno is ERC20, ERC20Burnable, AccessControl,TaxCollector{
 using SafeMath for uint256;
@@ -28,7 +28,9 @@ using SafeMath for uint256;
      mapping(address => uint) c_sum;
      mapping(address => uint) timestamp;
      uint256 k=30;
-     function giveRole(address loaner) public onlyRole(DEFAULT_ADMIN_ROLE) {
+     ILoaning ln;
+     function Initialise_Loaner(address loaner) public onlyRole(DEFAULT_ADMIN_ROLE) {
+       ln=ILoaning(loaner);
          _grantRole(MINTER_ROLE, loaner);
      }
      function GetSum(address account) public view returns(uint256)
@@ -82,11 +84,12 @@ using SafeMath for uint256;
     }
     //
     function redeem() public returns(bool){
-      require(Primary[msg.sender]!=0);
+      require(ln.Prime(msg.sender)>0);
       require(block.timestamp-timestamp[msg.sender]>1260);
-      cred[Primary[msg.sender]].creditsc_c=add(cred[Primary[msg.sender]].creditsc_c,c_sum[msg.sender]);
-      c_sum[msg.sender]=0;
       timestamp[msg.sender]=block.timestamp;
+      ln.increment(msg.sender,c_sum[msg.sender]);
+      c_sum[msg.sender]=0;
+
       return true;
     }
 }

@@ -1,7 +1,8 @@
 pragma solidity ^0.8.7;
 import "../NFT/NFT.sol";
 import "../Lending/ds-math/math.sol";
-contract TaxCollector is data,DSMath{
+import "../Lending/ILoaning.sol";
+contract TaxCollector is DSMath{
 //
 
 //

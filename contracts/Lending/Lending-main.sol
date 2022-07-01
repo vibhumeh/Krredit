@@ -12,9 +12,10 @@ contract Loaning is vouching(address(this)),Arrayfuncs,DSMath {
 using SafeMath for uint256;
 uint burner=80*adj;
 uint rate=20;
-
+event tester(uint myprime);
+event loan_taken(uint amount,uint finalPayment);
 //Neutron token=new Neutron(msg.sender,address(this));
-uint adj=10**18; //decimal adjustment
+ //decimal adjustment made in vouching.sol
 address reciever; //the address of this contract
 address allowedcon;
 address allowedcon2;
@@ -30,6 +31,7 @@ mapping (address=>uint256) I2;
 constructor(){
 _owner=msg.sender;
 treasury=_owner;
+cooldown=1000;
 
 }
 //cred[Primary[msg.sender]].
@@ -38,19 +40,21 @@ modifier only_owner(){
 _;}
 function set(address tk, address _NFT)public{
     token=_IERC20(tk);
-    NFT=ICredit(NFT);
+    NFT=ICredit(_NFT);
 }
-
+function smth(address someone) public{
+    emit tester(Primary[msg.sender]);
+}
 //function to take loan
 function takeloan (uint tier) public {
-require(Primary[msg.sender]!=0,"please confirm your primary credit card");
+  emit tester(Primary[msg.sender]);
+require(Primary[msg.sender]>0,"please confirm your primary credit card");
 require(sub(block.timestamp,cred[Primary[msg.sender]].timer)>=cooldown,"you are still under cooldown"); //so no loan spams
 require(cred[Primary[msg.sender]].creditsc_c>=tier*adj,"you do not have a high enough credit score");
 require(tier>0);
 require(!cred[Primary[msg.sender]].pending,"You have already taken a loan, please re-pay to take a new loan");
 uint interest;
 cred[Primary[msg.sender]].amount=100*wpow((add(adj,(adj.div(10)))),tier); //amount calc
-token.mint(msg.sender,cred[Primary[msg.sender]].amount);
 interest=wmul(cred[Primary[msg.sender]].amount,(rate.mul(adj.div(100))));//20%,interest+1% admin fee
 uint x=wmul(cred[Primary[msg.sender]].Rrate,cred[Primary[msg.sender]].medianL);
 uint l=wmul(cred[Primary[msg.sender]].defexpo,cred[Primary[msg.sender]].Drate);
@@ -61,6 +65,9 @@ cred[Primary[msg.sender]].pending=true;
 cred[Primary[msg.sender]].time=block.timestamp;
 if(tier==cred[Primary[msg.sender]].creditsc_c)
 cred[Primary[msg.sender]]._match==true;
+emit loan_taken(cred[Primary[msg.sender]].amount,I2[msg.sender]);
+token.mint(msg.sender,cred[Primary[msg.sender]].amount);
+
 }
 //repayment rate calc: rrate=1-Drate; //R
 //defult rate calc: drate=(defults/(repayed+defults));
@@ -142,13 +149,47 @@ function freemoney() public  payable{
     return true;
 }// set governor contract*/
 //for testing PURPOSE:
-function increment(address pardonee)public{
-    //require(msg.sender==allowedcon||msg.sender==allowedcon2,"you do not have permission to do this action.");
-    NFT.safeMint(pardonee);
-    cred[Primary[pardonee]].creditsc_c==1*adj;
-    cred[Primary[pardonee]].creditsc_uc==1*adj;
+event Set_Primary(uint256 token_ID);
+
+
+function setPrimary(uint tokenId)public {
+
+require(NFT.ownerOf(tokenId)==msg.sender,"setPrimary: caller is not owner nor approved");
+require(!cred[Primary[msg.sender]].pending,"you cannot change your primary when you are in debt");
+//only owner of token can call this function currently
+Primary[msg.sender]=tokenId;
+
+emit Set_Primary(Primary[msg.sender]);
 
 }
+function increment(address applicant,uint inc_amt)public{
+    require(Primary[applicant]>0,"please confirm your primary credit card");
+    cred[Primary[applicant]].creditsc_c=cred[Primary[applicant]].creditsc_c.add(inc_amt);//1*adj;
+    cred[Primary[applicant]].creditsc_uc=cred[Primary[applicant]].creditsc_uc.add(inc_amt);//1*adj;
 
+}
+event increasecred(uint);
+function inc(address applicant)public{
+    require(Primary[applicant]>0,"please confirm your primary credit card");
+    cred[Primary[msg.sender]].creditsc_c=cred[Primary[msg.sender]].creditsc_c.add(adj);//1*adj;
+cred[Primary[msg.sender]].creditsc_uc=cred[Primary[msg.sender]].creditsc_uc.add(adj);//1*adj;
+emit increasecred(cred[Primary[applicant]].creditsc_c);
+}
+function Pending(address user) public view returns(bool){
+  return cred[Primary[user]].pending;
+}
 
+function Prime(address _msgsender) public view returns(uint){
+  return Primary[_msgsender];
+}
+function Prime(address _msgsender,uint setAdd) public{
+Primary[_msgsender]=setAdd;
+}
+function Reset_credit(uint ID) public {
+  cred[ID]=cred[0];
+}
+function creds()public returns(uint256 cat){
+cat=cred[Primary[msg.sender]].creditsc_c;
+  return cat;
+}
 }
